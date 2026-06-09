@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+source ./utils.sh
+
 DDL_FILE="$1"
 WORK_DIR="$2"
 

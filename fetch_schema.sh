@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+source ./utils.sh
+
 # checking for the presence of the isql utility
 if [ ! -x "$ISQL_PATH" ]; then
     error "isql not found or not executable: $ISQL_PATH"

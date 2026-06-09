@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+source ./utils.sh
+
 WORK_DIR="${1:-.}"
 
 SYSTEM_PROCEDURES=(
