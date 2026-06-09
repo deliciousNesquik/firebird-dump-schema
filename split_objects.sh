@@ -9,7 +9,6 @@ WORK_DIR="$2"
 log "File processing: $DDL_FILE"
 log "Output directory: $WORK_DIR"
 
-
 if [ -d "$WORK_DIR" ]; then
     log "Removing the old output directory: $WORK_DIR"
     rm -rf "$WORK_DIR"
@@ -17,6 +16,19 @@ fi
 
 log "Creating directory structure..."
 mkdir -p "$WORK_DIR"/{01_EXTERNAL_FUNCTIONS,02_GENERATORS,03_DOMAINS,04_TABLES,05_VIEWS,06_EXCEPTIONS,07_FUNCTIONS,08_PROCEDURES,09_PACKAGES,10_TRIGGERS,11_ROLES,12_GRANTS,13_COMMENTS}
+
+# get the file system type for this path
+fs_type=$(df -P -T "$WORK_DIR" | tail -n 1 | awk '{print $2}')
+
+# exclude network (nfs, cifs, smb) and virtual (tmpfs, devtmpfs) disks
+case "$fs_type" in
+    ext4)
+		debug "The $WORK_DIR path is native (local)"
+        ;;
+    *)
+        error "Path $WORK_DIR is mounted or network (type: $fs_type) Processing may take a colossal amount of time!"
+        ;;
+esac
 
 # next comes the launch of the AWK parser...
 log "Running the AWK parser to extract objects..."

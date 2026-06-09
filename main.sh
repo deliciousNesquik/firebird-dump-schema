@@ -40,8 +40,17 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # phased launch
+
+START_TIME=$SECONDS
 ./fetch_schema.sh
+ELAPSED=$(( SECONDS - START_TIME ))
+log "Schema dump completed in ${ELAPSED} seconds"
+
+START_TIME=$SECONDS
 ./split_objects.sh "$METADATA_FILE" "$DUMP_DIR"
+ELAPSED=$(( SECONDS - START_TIME ))
+log "The metadata file is split into a structure in ${ELAPSED} seconds"
+
 ./clean_system.sh "$DUMP_DIR"
 
 # clear credentials from the current shell session before exiting
