@@ -17,12 +17,7 @@ fi
 # export functions so they are available in child scripts
 export -f log debug error
 
-
-# enable automatic export of all new variables
-set -a
-source "$CONFIG_FILE"
-# turn off automatic export to avoid further cluttering of the environment.
-set +a
+export $(grep -v '^#' "$CONFIG_FILE" | xargs)
 
 
 REQUIRED_VARS=("ISC_USER" "ISC_PASSWORD" "FB_DATABASE" "METADATA_FILE" "METADATA_FILE_DELETE_AFTER_PROCESSING" "DUMP_DIR" "ISQL_PATH" "ISQL_TIMEOUT")
