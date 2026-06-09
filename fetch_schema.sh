@@ -7,10 +7,10 @@ if [ ! -x "$ISQL_PATH" ]; then
     exit 1
 fi
 
-debug "DB username         			   : [$ISC_USER]"
-debug "User password       			   : [********]"
-debug "Path to the DB      			   : [$FB_DATABASE]"
-debug "Metadata file       			   : [$METADATA_FILE]"
+debug "DB username                     : [$ISC_USER]"
+debug "User password                   : [********]"
+debug "Path to the DB                  : [$FB_DATABASE]"
+debug "Metadata file                   : [$METADATA_FILE]"
 debug "Delete metadata file after dump : [$METADATA_FILE_DELETE_AFTER_PROCESSING]"
 
 if [ -f "$METADATA_FILE" ]; then
