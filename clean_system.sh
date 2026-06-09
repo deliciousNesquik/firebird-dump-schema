@@ -4,13 +4,35 @@ set -euo pipefail
 source ./utils.sh
 
 WORK_DIR="${1:-.}"
+PROCEDURES_LIST="./system_procedures.list"
+FUNCTIONS_LIST="./system_functions.list"
 
-SYSTEM_PROCEDURES=(
-    "TRANSITIONS" "CANCEL_SESSION" "DISCARD" "FINISH_SESSION" "FLUSH"
-    "PAUSE_SESSION" "RESUME_SESSION" "SET_FLUSH_INTERVAL" "CANCEL_BLOB"
-    "CLOSE_HANDLE" "OPEN_BLOB" "CREATE_BLOB" "SEEK" "READ_DATA" "IS_WRITABLE"
-)
+SYSTEM_PROCEDURES=()
 SYSTEM_FUNCTIONS=()
+
+# dynamic loading of a list of procedures
+if [ -f "$PROCEDURES_LIST" ]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line="${line%$'\r'}"
+        [[ -z "$line" || "$line" == \#* ]] && continue
+        SYSTEM_PROCEDURES+=("$line")
+    done < "$PROCEDURES_LIST"
+    debug "System procedures loaded: ${#SYSTEM_PROCEDURES[@]}"
+else
+    debug "List file $PROCEDURES_LIST not found. Skipping system procedures removal."
+fi
+
+# dynamic loading of a list of functions
+if [ -f "$FUNCTIONS_LIST" ]; then
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line="${line%$'\r'}"
+        [[ -z "$line" || "$line" == \#* ]] && continue
+        SYSTEM_FUNCTIONS+=("$line")
+    done < "$FUNCTIONS_LIST"
+    debug "System procedures loaded: ${#SYSTEM_FUNCTIONS[@]}"
+else
+    debug "List file $FUNCTIONS_LIST not found. Skipping system procedures removal."
+fi
 
 count=0
 
