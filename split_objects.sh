@@ -24,3 +24,8 @@ else
     error "ERROR: File processing error"
     exit 1
 fi
+
+if [[ "$METADATA_FILE_DELETE_AFTER_PROCESSING" == 'true' ]]; then
+	log "Delete the metadata file after the parser finishes."
+	rm -rf "$DDL_FILE"
+fi
