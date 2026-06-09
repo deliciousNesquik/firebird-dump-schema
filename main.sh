@@ -7,12 +7,20 @@ exec > >(tee -a "audit_$(date +%Y%m%d).log") 2>&1
 
 log "Starting the schematic upload process..."
 
+if [[ ${1:-} == "" ]]; then
+	debug "The startup arguments are missing the path to the .env file. I'm using the default value."
+	CONFIG_FILE=".env"
+else
+	debug "The path to the .env file is passed in the launch parameters."
+	CONFIG_FILE=${1:-}
+fi
 
-CONFIG_FILE=".env"
 if [ ! -f "$CONFIG_FILE" ]; then
     error "Configuration file $CONFIG_FILE not found"
     exit 1
 fi
+
+debug "Enviroment file                 : [$CONFIG_FILE]"
 
 export $(grep -v '^#' "$CONFIG_FILE" | xargs)
 
