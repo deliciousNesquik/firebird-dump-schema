@@ -7,14 +7,12 @@ exec > >(tee -a "audit_$(date +%Y%m%d).log") 2>&1
 
 log "Starting the schematic upload process..."
 
+
 CONFIG_FILE=".env"
 if [ ! -f "$CONFIG_FILE" ]; then
     error "Configuration file $CONFIG_FILE not found"
     exit 1
 fi
-
-# export functions so they are available in child scripts
-export -f log debug error
 
 export $(grep -v '^#' "$CONFIG_FILE" | xargs)
 
