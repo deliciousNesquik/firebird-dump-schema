@@ -3,6 +3,8 @@ set -euo pipefail
 
 source ./utils.sh
 
+exec > >(tee -a "audit_$(date +%Y%m%d).log") 2>&1
+
 log "Starting the schematic upload process..."
 
 CONFIG_FILE=".env"
