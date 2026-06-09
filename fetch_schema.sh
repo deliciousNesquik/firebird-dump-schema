@@ -1,31 +1,32 @@
 #!/bin/bash
 set -euo pipefail
 
-# Проверка наличия утилиты isql
+# checking for the presence of the isql utility
 if [ ! -x "$ISQL_PATH" ]; then
-    error "isql не найден или не исполняемый: $ISQL_PATH"
+    error "isql not found or not executable: $ISQL_PATH"
     exit 1
 fi
 
-debug "Имя пользователя БД : [$ISC_USER]"
-debug "Пароль пользователя : [********]"
-debug "Путь до БД          : [$FB_DATABASE]"
-debug "Файл метаданных     : [$METADATA_FILE]"
+debug "DB username         			   : [$ISC_USER]"
+debug "User password       			   : [********]"
+debug "Path to the DB      			   : [$FB_DATABASE]"
+debug "Metadata file       			   : [$METADATA_FILE]"
+debug "Delete metadata file after dump : [$METADATA_FILE_DELETE_AFTER_PROCESSING]"
 
 if [ -f "$METADATA_FILE" ]; then
-    debug "Удаление старого файла метаданных"
+    debug "Deleting the old metadata file"
     rm -f "$METADATA_FILE"
 fi
 
-log "Извлечение метаданных через isql..."
+log "Extracting metadata via isql..."
 
-# Экспортируем пароль в область видимости isql
+# exporting the password to the isql scope
 export ISC_USER="$ISC_USER"
 export ISC_PASSWORD="$ISC_PASSWORD"
 
 if "$ISQL_PATH" -a -output "$METADATA_FILE" "$FB_DATABASE"; then
-    log "Метаданные успешно извлечены в $METADATA_FILE"
+    log "Metadata successfully extracted to $METADATA_FILE"
 else
-    error "Ошибка извлечения метаданных утилитой isql"
+    error "Error retrieving metadata using isql utility"
     exit 1
 fi

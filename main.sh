@@ -1,51 +1,55 @@
 #!/bin/bash
 set -euo pipefail
 
-# Центр логирования
+# script logging functions
 log() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] [INFO] $1"; }
 debug() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] [DEBUG] $1"; }
 error() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] [ERROR] $1" >&2; }
 
-log "Запуск процесса выгрузки схемы..."
+log "Starting the schematic upload process..."
 
 CONFIG_FILE=".env"
 if [ ! -f "$CONFIG_FILE" ]; then
-    error "Файл конфигурации $CONFIG_FILE не найден"
+    error "Configuration file $CONFIG_FILE not found"
     exit 1
 fi
 
-# Экспортируем функции, чтобы они были доступны в дочерних скриптах
+# export functions so they are available in child scripts
 export -f log debug error
 
-# Включаем автоматический экспорт всех новых переменных
+
+# enable automatic export of all new variables
 set -a
 source "$CONFIG_FILE"
-# Выключаем автоматический экспорт, чтобы не засорять окружение дальше
+# turn off automatic export to avoid further cluttering of the environment.
 set +a
 
-REQUIRED_VARS=("ISC_USER" "ISC_PASSWORD" "FB_DATABASE" "METADATA_FILE" "DUMP_DIR" "ISQL_PATH")
+
+REQUIRED_VARS=("ISC_USER" "ISC_PASSWORD" "FB_DATABASE" "METADATA_FILE" "METADATA_FILE_DELETE_AFTER_PROCESSING" "DUMP_DIR" "ISQL_PATH")
 for var in "${REQUIRED_VARS[@]}"; do
     if [ -z "${!var:-}" ]; then
-        error "Переменная $var не задана в $CONFIG_FILE"
+        error "The variable $var is not defined in $CONFIG_FILE"
         exit 1
     fi
 done
 
-# Приводим пути к абсолютным значениям ДО перехода по директориям
+
+# we convert paths to absolute values ​​BEFORE navigating through directories
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Если пути относительные, делаем их абсолютными от корня запуска
+# if the paths are relative, make them absolute from the root of the launcher
 [[ "$METADATA_FILE" = /* ]] || METADATA_FILE="$SCRIPT_DIR/$METADATA_FILE"
 [[ "$DUMP_DIR" = /* ]] || DUMP_DIR="$SCRIPT_DIR/$DUMP_DIR"
 
-# Переходим в директорию скриптов для корректного запуска зависимостей
+
+# go to the script directory to correctly run dependencies
 cd "$SCRIPT_DIR"
 
-# Поэтапный запуск
+# phased launch
 ./fetch_schema.sh
 ./split_objects.sh "$METADATA_FILE" "$DUMP_DIR"
 ./clean_system.sh "$DUMP_DIR"
 
-# Очистка учетных данных из текущей сессии shell перед выходом
+# clear credentials from the current shell session before exiting
 unset ISC_USER ISC_PASSWORD
-log "Работа скрипта успешно завершена. Готово."
+log "The script completed successfully. Done."

@@ -4,27 +4,25 @@ set -euo pipefail
 DDL_FILE="$1"
 WORK_DIR="$2"
 
-log "Обработка файла: $DDL_FILE"
-log "Директория вывода: $WORK_DIR"
+log "File processing: $DDL_FILE"
+log "Output directory: $WORK_DIR"
 
-# -----------------------------------------------------------------
-# Подготовка директории (Полная очистка и пересоздание)
-# -----------------------------------------------------------------
+
 if [ -d "$WORK_DIR" ]; then
-    log "Удаление старой директории вывода: $WORK_DIR"
+    log "Removing the old output directory: $WORK_DIR"
     rm -rf "$WORK_DIR"
 fi
 
-log "Создание структуры директорий..."
+log "Creating directory structure..."
 mkdir -p "$WORK_DIR"/{01_EXTERNAL_FUNCTIONS,02_GENERATORS,03_DOMAINS,04_TABLES,05_VIEWS,06_EXCEPTIONS,07_FUNCTIONS,08_PROCEDURES,09_PACKAGES,10_TRIGGERS,11_ROLES,12_GRANTS,13_COMMENTS}
 
-# Дальше идет запуск AWK-парсера...
-log "Запуск AWK-парсера для извлечения объектов..."
+# next comes the launch of the AWK parser...
+log "Running the AWK parser to extract objects..."
 if awk -v WORK_DIR="$WORK_DIR" '
 
-# Функция для переключения файлов (решает проблему ulimit)
+# function for switching files
 function switch_file(new_file) {
-    # Если файл изменился (или нам приказали сбросить вывод передав "")
+    # if the file has changed (or we were told to reset the output by passing "")
     if (CURRENT_FILE != "" && CURRENT_FILE != new_file) {
         close(CURRENT_FILE)
     }
@@ -37,14 +35,14 @@ function write_line() {
     }
 }
 
-# Функция очистки имени. Удаляет ;, ^, запятые (,), а также всё, начиная со скобки (
+# name cleanup function. Removes ;, ^, commas (,), and everything starting with a parenthesis (
 function clean_name(str) {
-    gsub(/[;^,]+$/, "", str) # удаляем мусор в конце строки (включая запятые!)
-    sub(/\(.*$/, "", str)    # удаляем прилипшие параметры: name(:VAR) -> name
+    gsub(/[;^,]+$/, "", str) # remove garbage at the end of the line (including commas!)
+    sub(/\(.*$/, "", str)    # remove stuck parameters: name(:VAR) -> name
     return str
 }
 
-# Функция поиска слова после ключевого (INDEX, PROCEDURE и т.д.)
+# function to search for a word after a keyword (INDEX, PROCEDURE, etc.)
 function get_word_after(target_word) {
     for (i = 1; i <= NF; i++) {
         if ($i == target_word) return clean_name($(i+1))
@@ -52,8 +50,7 @@ function get_word_after(target_word) {
     return ""
 }
 
-# 1. ОПРЕДЕЛЕНИЕ ТЕКУЩЕГО КОНТЕКСТА
-# Внимание: здесь убран next, чтобы строки-триггеры (типа /* Table: ...) не проглатывались!
+# 1. DETERMINING THE CURRENT CONTEXT
 /^\/\*  External Function declarations \*\/$/    { DIR = "01_EXTERNAL_FUNCTIONS"; switch_file("") }
 /^\/\*  Generators or sequences \*\/$/           { DIR = "02_GENERATORS"; switch_file("") }
 /^\/\* Domain definitions \*\/$/                 { DIR = "03_DOMAINS"; switch_file("") }
@@ -77,7 +74,7 @@ function get_word_after(target_word) {
     write_line()
 }
 
-# 2. ОБРАБОТКА ОБЪЕКТОВ
+# 2. PROCESSING OBJECTS
 
 # 01_EXTERNAL_FUNCTIONS
 /^DECLARE EXTERNAL FUNCTION/,/;$/ {
@@ -106,7 +103,7 @@ function get_word_after(target_word) {
     write_line()
 }
 
-# 04_TABLES (Индексы)
+# 04_TABLES (Indexes)
 /^CREATE / && / INDEX /,/;$/ {
     if (DIR == "04_TABLES" && /^CREATE /) {
         idx_name = get_word_after("INDEX")
@@ -131,10 +128,10 @@ function get_word_after(target_word) {
 /^CREATE OR ALTER FUNCTION/ || /^ALTER FUNCTION/ || /^CREATE FUNCTION/,/\^$/ {
     if (DIR == "07_FUNCTIONS") {
         if (/^CREATE /) {
-            # Это пустышка (Declaration) - складываем в общий файл
+            # this is a dummy (Declaration) - we put it in a common file
             switch_file(WORK_DIR "/" DIR "/00_DECLARATION.sql")
         } else if (/^ALTER /) {
-            # Это тело (Implementation) - складываем в индивидуальный файл
+            # this body (Implementation) - we put it in a separate file
             func_name = get_word_after("FUNCTION")
             if (func_name != "") { switch_file(WORK_DIR "/" DIR "/" func_name ".sql") }
         }
@@ -146,10 +143,10 @@ function get_word_after(target_word) {
 /^CREATE PROCEDURE / || /^CREATE OR ALTER PROCEDURE/ || /^ALTER PROCEDURE/,/\^$/ {
     if (DIR == "08_PROCEDURES") {
         if (/^CREATE /) {
-            # Это пустышка (Declaration) - складываем в общий файл
+            # this is a dummy (Declaration) - we put it in a common file
             switch_file(WORK_DIR "/" DIR "/00_DECLARATION.sql")
         } else if (/^ALTER /) {
-            # Это тело (Implementation) - складываем в индивидуальный файл
+            # this body (Implementation) - we put it in a separate file
             proc_name = get_word_after("PROCEDURE")
             if (proc_name != "") { switch_file(WORK_DIR "/" DIR "/" proc_name ".sql") }
         }
@@ -172,7 +169,7 @@ function get_word_after(target_word) {
     write_line()
 }
 
-# 11, 12, 13 РОЛИ, ГРАНТЫ И КОММЕНТАРИИ
+# 11, 12, 13 ROLES, GRANDS AND COMMENTS
 /^\/\* Role/,/;$/ {
     if (DIR == "11_ROLES") { switch_file(WORK_DIR "/" DIR "/ROLES.sql") }
     write_line()
@@ -188,8 +185,8 @@ function get_word_after(target_word) {
     write_line()
 }
 ' "$DDL_FILE"; then
-    log "Успешно: объекты разделены по директориям"
+    log "Success: objects are separated into directories"
 else
-    log "ERROR: Ошибка обработки файла"
+    error "ERROR: File processing error"
     exit 1
 fi

@@ -22,7 +22,7 @@ remove_objects() {
             local target="$target_dir/${obj}.sql"
             if [ -f "$target" ]; then
                 rm -f "$target"
-                debug "Удалён системный объект: $target"
+                debug "System object removed: $target"
                 ((count++))
             fi
         done
@@ -32,4 +32,4 @@ remove_objects() {
 remove_objects "$WORK_DIR/08_PROCEDURES" "${SYSTEM_PROCEDURES[@]+"${SYSTEM_PROCEDURES[@]}"}"
 remove_objects "$WORK_DIR/07_FUNCTIONS" "${SYSTEM_FUNCTIONS[@]+"${SYSTEM_FUNCTIONS[@]}"}"
 
-log "Удалено системных объектов: $count"
+log "System objects removed: $count"
