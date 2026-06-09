@@ -24,7 +24,14 @@ log "Extracting metadata via isql..."
 export ISC_USER="$ISC_USER"
 export ISC_PASSWORD="$ISC_PASSWORD"
 
-if "$ISQL_PATH" -a -output "$METADATA_FILE" "$FB_DATABASE"; then
+# Prepare timeout prefix
+[[ "$ISQL_TIMEOUT" -lt 1 ]] && {
+    error "The timeout specified is less than 1. Don't use a timeout to run the command."
+    TIMEOUT_CMD=()
+} || TIMEOUT_CMD=(timeout "$ISQL_TIMEOUT")
+
+# Execute
+if "${TIMEOUT_CMD[@]}" "$ISQL_PATH" -a -output "$METADATA_FILE" "$FB_DATABASE"; then
     log "Metadata successfully extracted to $METADATA_FILE"
 else
     error "Error retrieving metadata using isql utility"
