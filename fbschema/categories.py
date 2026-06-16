@@ -110,12 +110,13 @@ def _af_exception(ctx: Context, e: Any) -> Iterator[Artifact]:
 
 
 def _af_function(ctx: Context, f: Any) -> Iterator[Artifact]:
-    yield Artifact("07_FUNCTIONS/00_DECLARATION.sql", f.get_sql_for("create", no_code=True), psql=True)
+    # Объявление и тело — отдельные соседние файлы: ИМЯ.declaration.sql + ИМЯ.sql.
+    yield Artifact(f"07_FUNCTIONS/{fname(f.name, '.declaration')}", f.get_sql_for("create", no_code=True), psql=True)
     yield Artifact(f"07_FUNCTIONS/{fname(f.name)}", "ALTER" + f.get_sql_for("create")[6:], psql=True)
 
 
 def _af_procedure(ctx: Context, p: Any) -> Iterator[Artifact]:
-    yield Artifact("08_PROCEDURES/00_DECLARATION.sql", p.get_sql_for("create", no_code=True), psql=True)
+    yield Artifact(f"08_PROCEDURES/{fname(p.name, '.declaration')}", p.get_sql_for("create", no_code=True), psql=True)
     yield Artifact(f"08_PROCEDURES/{fname(p.name)}", "ALTER" + p.get_sql_for("create")[6:], psql=True)
 
 

@@ -72,7 +72,7 @@ cli.main(argv)
 `Category(key, subdir, aliases, objects, artifacts_for, name_of)`. `objects()` инкапсулирует фильтр `is_sys_object()` и расщепление общих коллекций по виду (на `schema.functions` сидят `external_function` через `is_external()` и PSQL `function`). `artifacts_for(ctx, obj)` повторяет логику `get_metadata_ddl`:
 
 - Таблицы: `get_sql_for('create', no_pk=True, no_unique=True)` + констрейнты из `table.constraints` (пропуская `is_not_null`) в тот же файл. **Индексы — отдельная категория** `index` (не-enforcer), файлы тоже в `04_TABLES`.
-- Процедуры/функции: stub `get_sql_for('create', no_code=True)` → `00_DECLARATION.sql`; тело `'ALTER' + get_sql_for('create')[6:]` → файл по объекту. Пропуск `is_packaged()`; внешние функции — `01_…` через `'declare'`.
+- Процедуры/функции: два соседних файла по объекту — объявление `get_sql_for('create', no_code=True)` → `<ИМЯ>.declaration.sql`; тело `'ALTER' + get_sql_for('create')[6:]` → `<ИМЯ>.sql`. Пропуск `is_packaged()`; внешние функции — `01_…` через `'declare'`. Суффикс `.declaration` держит файлы рядом при сортировке.
 - Пакеты: header `get_sql_for('create')` + тело `get_sql_for('create', body=True)`.
 
 Селектируемые категории — в `SELECTABLE`/`CATEGORY_BY_ALIAS`; `TYPE_CHOICES` — значения для `--type`. **Не категории** (только полный режим): `database_preamble` (`DATABASE.sql`), `full_grants` (`12_GRANTS`), `full_comments` (`13_COMMENTS`) — поэтому `--type grant/comment` отклоняется argparse'ом.

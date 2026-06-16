@@ -37,14 +37,22 @@ def test_table_emits_create_then_ordered_constraints():
     assert all(a.path == "04_TABLES/ACC.sql" for a in arts)
 
 
-def test_function_declaration_and_body_split():
+def test_function_declaration_and_body_are_separate_adjacent_files():
     arts = _arts("function", FObj("CALC"))
     paths = [a.path for a in arts]
-    assert "07_FUNCTIONS/00_DECLARATION.sql" in paths
-    assert "07_FUNCTIONS/CALC.sql" in paths
+    assert "07_FUNCTIONS/CALC.declaration.sql" in paths   # объявление — свой файл
+    assert "07_FUNCTIONS/CALC.sql" in paths               # тело — обычный файл
     assert all(a.psql for a in arts)
-    body = next(a.sql for a in arts if a.path.endswith("CALC.sql"))
+    body = next(a.sql for a in arts if a.path == "07_FUNCTIONS/CALC.sql")
     assert body.startswith("ALTER")
+    # соседство при сортировке: declaration идёт вплотную перед телом
+    files = sorted(p.rsplit("/", 1)[1] for p in paths)
+    assert files == ["CALC.declaration.sql", "CALC.sql"]
+
+
+def test_procedure_declaration_and_body_separate():
+    paths = {a.path for a in _arts("procedure", FObj("DOIT"))}
+    assert paths == {"08_PROCEDURES/DOIT.declaration.sql", "08_PROCEDURES/DOIT.sql"}
 
 
 def test_objects_filters_system_and_kind():

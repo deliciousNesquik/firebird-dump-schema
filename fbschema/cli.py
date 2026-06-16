@@ -74,7 +74,7 @@ def run_full(ctx: Context, dump_dir: Path) -> int:
     run = Run()
     run.artifacts.append(categories.database_preamble(ctx))
     for cat in categories.SELECTABLE:
-        # Сортировка по имени — детерминизм агрегатов (00_DECLARATION/ROLES) и
+        # Сортировка по имени — детерминизм агрегатов (ROLES/GRANTS/COMMENTS) и
         # стабильные diff'ы между прогонами.
         for obj in sorted(cat.objects(ctx.schema), key=cat.name_of):
             run.emit_object(ctx, cat, obj)
