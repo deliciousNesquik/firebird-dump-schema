@@ -175,12 +175,20 @@ def main(argv: list[str] | None = None) -> int:
     except TimeoutError as exc:
         log.error(str(exc))
         return 1
+    except UnicodeDecodeError as exc:
+        log.error(f"Ошибка декодирования метаданных: {exc}")
+        log.error(f"Похоже, кодировка БД не {cfg.charset}. Укажите её в .env, "
+                  f"напр. DB_CHARSET=WIN1251 (частый случай для кириллицы).")
+        return 1
     except Exception as exc:  # noqa: BLE001
         log.error(f"Ошибка при извлечении схемы: {exc}")
         return 1
     finally:
         if con is not None:
-            con.close()
+            try:
+                con.close()
+            except Exception as exc:  # noqa: BLE001 — соединение могло уже оборваться
+                log.debug(f"Не удалось корректно закрыть соединение: {exc}")
         for var in ("ISC_USER", "ISC_PASSWORD"):
             os.environ.pop(var, None)
 
