@@ -2,12 +2,35 @@
 name = "firebird-dump-schema"
 version = "0.1.0"
 description = "Извлечение схемы Firebird в дерево «один объект — один файл»"
+readme = "README.md"
 requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "deliciousNesquik" }]
+keywords = ["firebird", "schema", "ddl", "database", "migration", "versioning"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Software Development :: Version Control",
+]
 dependencies = [
     "firebird-driver>=1.10",
     "firebird-lib>=1.5",
     "python-dotenv>=1.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/deliciousNesquik/firebird-dump-schema"
+Repository = "https://github.com/deliciousNesquik/firebird-dump-schema"
+Issues = "https://github.com/deliciousNesquik/firebird-dump-schema/issues"
 
 [project.scripts]
 fb-dump-schema = "fbschema.cli:main"
@@ -15,6 +38,7 @@ fb-dump-schema = "fbschema.cli:main"
 [dependency-groups]
 dev = [
     "pyright>=1.1",
+    "pytest>=8",
 ]
 
 [build-system]
@@ -23,16 +47,3 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["fbschema"]
-
-[tool.uv]
-# Внутренний Step CA обслуживает *.reid.local — доверяем системному хранилищу
-# сертификатов вместо встроенного набора webpki.
-native-tls = true
-
-# Внутренний индекс (devpi). Наследует upstream PyPI, поэтому резолвит и
-# приватные колёса, и публичные пакеты. default = true делает его индексом
-# по умолчанию вместо pypi.org.
-[[tool.uv.index]]
-name = "reid"
-url = "https://pypi.reid.local/reid21/dev/+simple/"
-default = true
