@@ -29,6 +29,10 @@ class Context:
 
     schema: "Schema"
     dialect: int
+    # Писать ли текущее значение генераторов (ALTER SEQUENCE ... RESTART WITH n).
+    # По умолчанию нет: это runtime-состояние, оно меняется постоянно и засоряет
+    # diff'ы при регулярном дампе. Включается флагом --with-generator-values.
+    with_generator_values: bool = False
 
 
 # Нумерованное дерево категорий. Создаётся целиком (даже пустые директории),

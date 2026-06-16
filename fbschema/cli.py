@@ -41,6 +41,8 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="в точечном режиме печатать SQL в консоль вместо записи в дерево")
     p.add_argument("--with-deps", action="store_true", dest="with_deps",
                    help="в точечном режиме также выгрузить объекты, от которых зависят названные (RDB$DEPENDENCIES)")
+    p.add_argument("--with-generator-values", action="store_true", dest="with_generator_values",
+                   help="писать текущие значения генераторов (по умолчанию нет — это runtime-состояние)")
     return p
 
 
@@ -159,7 +161,8 @@ def main(argv: list[str] | None = None) -> int:
         with timeout.limit(cfg.timeout):
             log.info("Подключение и чтение метаданных (read-committed, rec-version, NO WAIT)...")
             con = db.open_connection(cfg)
-            ctx = Context(schema=con.schema, dialect=db.dialect(con))
+            ctx = Context(schema=con.schema, dialect=db.dialect(con),
+                          with_generator_values=args.with_generator_values)
 
             if args.list_mode:
                 code = run_list(ctx, args.type)

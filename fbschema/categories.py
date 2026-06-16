@@ -70,10 +70,13 @@ def _af_external_function(ctx: Context, f: Any) -> Iterator[Artifact]:
 def _af_generator(ctx: Context, g: Any) -> Iterator[Artifact]:
     rel = f"02_GENERATORS/{fname(g.name)}"
     yield Artifact(rel, g.get_sql_for("create"))
-    try:
-        yield Artifact(rel, g.get_sql_for("alter", value=g.value))
-    except Exception:  # noqa: BLE001 — текущее значение не всегда читаемо
-        pass
+    # Текущее значение — runtime-состояние, пишем только по явному запросу,
+    # иначе каждый дамп даёт diff даже при неизменной схеме.
+    if ctx.with_generator_values:
+        try:
+            yield Artifact(rel, g.get_sql_for("alter", value=g.value))
+        except Exception:  # noqa: BLE001 — текущее значение не всегда читаемо
+            pass
 
 
 def _af_domain(ctx: Context, d: Any) -> Iterator[Artifact]:
