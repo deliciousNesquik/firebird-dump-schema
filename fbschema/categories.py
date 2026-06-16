@@ -173,13 +173,18 @@ def database_preamble(ctx: Context) -> Artifact:
     return Artifact("DATABASE.sql", f"SET SQL DIALECT {ctx.dialect}")
 
 
+def _by_name(items: Iterable[Any]) -> list[Any]:
+    return sorted(items, key=lambda o: o.name)
+
+
 def full_grants(ctx: Context) -> Iterator[Artifact]:
     privs = [
         p
         for p in ctx.schema.privileges
         if p.user_name != "SYSDBA" and not _is_sys(p.subject)
     ]
-    for stmt in get_grants(privs):
+    # sorted — детерминированный порядок строк в GRANTS.sql.
+    for stmt in sorted(get_grants(privs)):
         yield Artifact("12_GRANTS/GRANTS.sql", stmt)
 
 
@@ -197,14 +202,14 @@ def full_comments(ctx: Context) -> Iterator[Artifact]:
         schema.functions,
         schema.roles,
     ):
-        for obj in coll:
+        for obj in _by_name(coll):
             if _is_sys(obj):
                 continue
             if getattr(obj, "description", None) is not None:
                 yield Artifact("13_COMMENTS/COMMENTS.sql", obj.get_sql_for("comment"))
-    for t in schema.tables:
+    for t in _by_name(schema.tables):
         if _is_sys(t):
             continue
-        for col in t.columns:
+        for col in _by_name(t.columns):
             if getattr(col, "description", None) is not None:
                 yield Artifact("13_COMMENTS/COMMENTS.sql", col.get_sql_for("comment"))
