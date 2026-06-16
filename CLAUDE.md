@@ -63,7 +63,7 @@ cli.main(argv)
 | `db.py` | `open_connection()`, `dialect()` и **политика NO-WAIT** (патч при импорте) |
 | `model.py` | `Artifact`, `Context`, `SUBDIRS` |
 | `categories.py` | `Category` + `objects()`/`artifacts_for()` по видам, реестры, `database_preamble`/`full_grants`/`full_comments`, `_is_sys`, `get_grants` |
-| `selection.py` | `resolve(names, type)` → `Resolved(matches, missing)`; seam `expand_deps` |
+| `selection.py` | `resolve(names, type)` → `Resolved(matches, missing)`; `expand_deps` (для `--with-deps`) |
 | `render.py` | `fname()`, `render(statements, psql)` — терминаторы/`SET TERM` |
 | `writer.py` | `WriteMode` (FULL/TREE/STDOUT), группировка артефактов → запись/печать |
 
@@ -85,6 +85,15 @@ cli.main(argv)
 
 Группировка артефактов идёт в порядке вставки (детерминизм). `render()` оборачивает PSQL в `SET TERM ^ ;` … `^` … `SET TERM ; ^`, остальное — `;`.
 
+### Точечный режим: --with-deps
+
+Флаг `--with-deps` (только точечный режим) транзитивно добавляет объекты, от которых зависят названные. `selection.expand_deps` обходит зависимости в ширину с множеством посещённых (защита от циклов). Источники зависимостей:
+
+1. **RDB$DEPENDENCIES** через `SchemaItem.get_dependencies()`; `Dependency.depended_on` отдаёт сам объект, а `_category_of` маппит его в `Category` **по классу** (не по коду `RDB$OBJECT_TYPE`) — это важно для функций: UDF и PSQL имеют один код 15, но различаются через `is_external()`. Колонки разворачиваются в свою таблицу/представление.
+2. **Домены столбцов/параметров** (`_domain_refs`) — связь «столбец → домен типа» Firebird в RDB$DEPENDENCIES НЕ пишет, поэтому собираем её отдельно из `.columns` (таблицы/представления) и `.input_params`/`.output_params`/`.arguments` (процедуры/функции); системные RDB$-домены inline-типов отсеиваются по `is_sys_object`.
+
+Системные и пакетные объекты пропускаются. Остаточные пробелы — связи, которых нет ни в RDB$DEPENDENCIES, ни в (1)/(2): напр. таблицы по внешнему ключу или объекты из динамического SQL не отслеживаются.
+
 ### Точечный режим: grants/comments
 
 Гранты и комментарии — кросс-секущие (привязаны к объектам). В точечном режиме файлы `GRANTS.sql`/`COMMENTS.sql` **не трогаются** (чтобы точечное обновление не переписало глобальный агрегат). Роль (`ROLES.sql`) при точечном выборе перезаписывается целиком. Освежает гранты/комментарии полный дамп.
@@ -97,7 +106,7 @@ cli.main(argv)
 
 ## Вне рамок (сейчас)
 
-`--with-deps` (обход `RDB$DEPENDENCIES`) — seam в `selection.expand_deps`, флаг пока не выставлен. preload/bulk-оптимизация N+1 не нужна (запуск в LAN). `isql` не используем. Firebird 2.5 (`fdb`) вне охвата. Чистка Reid-специфики (внутренний индекс/CA в `pyproject`) — отдельно перед публикацией.
+preload/bulk-оптимизация N+1 не нужна (запуск в LAN). `isql` не используем. Firebird 2.5 (`fdb`) вне охвата. Чистка Reid-специфики (внутренний индекс/CA в `pyproject`) — отдельно перед публикацией.
 
 ## Оговорка
 

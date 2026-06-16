@@ -158,6 +158,7 @@ SELECTABLE: tuple[Category, ...] = CATEGORIES
 CATEGORY_BY_ALIAS: dict[str, Category] = {
     alias: cat for cat in CATEGORIES for alias in cat.aliases
 }
+CATEGORY_BY_KEY: dict[str, Category] = {cat.key: cat for cat in CATEGORIES}
 CATEGORY_ORDER: dict[str, int] = {cat.key: i for i, cat in enumerate(CATEGORIES)}
 TYPE_CHOICES: tuple[str, ...] = tuple(sorted(CATEGORY_BY_ALIAS))
 

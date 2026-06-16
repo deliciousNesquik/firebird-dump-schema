@@ -39,6 +39,8 @@ def _build_parser() -> argparse.ArgumentParser:
                    help="перечислить объекты по категориям и выйти")
     p.add_argument("--stdout", action="store_true", dest="to_stdout",
                    help="в точечном режиме печатать SQL в консоль вместо записи в дерево")
+    p.add_argument("--with-deps", action="store_true", dest="with_deps",
+                   help="в точечном режиме также выгрузить объекты, от которых зависят названные (RDB$DEPENDENCIES)")
     return p
 
 
@@ -80,18 +82,26 @@ def run_full(ctx: Context, dump_dir: Path) -> int:
 
 
 def run_targeted(ctx: Context, dump_dir: Path, names: list[str],
-                 type_alias: str | None, to_stdout: bool) -> int:
+                 type_alias: str | None, to_stdout: bool, with_deps: bool) -> int:
     resolved = selection.resolve(ctx.schema, names, type_alias)
     for name in resolved.missing:
         log.warning(f"Объект не найден: {name}")
+
+    targets = list(resolved.matches)
+    if with_deps and targets:
+        extra = selection.expand_deps(ctx.schema, targets)
+        if extra:
+            log.info(f"--with-deps: добавлено зависимостей: {len(extra)}")
+        targets += extra
+
     run = Run()
-    for cat, obj in resolved.matches:
+    for cat, obj in targets:
         run.emit_object(ctx, cat, obj)
     mode = WriteMode.STDOUT if to_stdout else WriteMode.TREE
     count = writer.write(run.artifacts, dump_dir, mode)
     where = "напечатано" if to_stdout else f"записано в {dump_dir}"
     log.info(f"Готово: {where} файлов {count}, "
-             f"объектов {len(resolved.matches)}, пропущено {run.skipped}, "
+             f"объектов {len(targets)}, пропущено {run.skipped}, "
              f"не найдено {len(resolved.missing)}")
     return 3 if (run.skipped or resolved.missing) else 0
 
@@ -117,6 +127,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--list нельзя использовать вместе с --stdout")
     if args.to_stdout and not args.names:
         parser.error("--stdout доступен только в точечном режиме (с именами объектов)")
+    if args.with_deps and not args.names:
+        parser.error("--with-deps доступен только в точечном режиме (с именами объектов)")
     if args.type and not args.names and not args.list_mode:
         parser.error("--type имеет смысл только в точечном режиме или с --list")
 
@@ -152,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.list_mode:
                 code = run_list(ctx, args.type)
             elif args.names:
-                code = run_targeted(ctx, cfg.dump_dir, args.names, args.type, args.to_stdout)
+                code = run_targeted(ctx, cfg.dump_dir, args.names, args.type, args.to_stdout, args.with_deps)
             else:
                 code = run_full(ctx, cfg.dump_dir)
     except TimeoutError as exc:
