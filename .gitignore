@@ -1,0 +1,18 @@
+# Local config with credentials
+.env
+*.env
+!.env.example
+
+# Audit logs
+audit_*.log
+
+# Generated schema dump (default DUMP_DIR)
+/database/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# macOS
+.DS_Store

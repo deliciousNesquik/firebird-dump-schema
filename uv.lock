@@ -1,0 +1,141 @@
+version = 1
+revision = 3
+requires-python = ">=3.11"
+
+[[package]]
+name = "firebird-base"
+version = "2.0.3"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+dependencies = [
+    { name = "protobuf" },
+]
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/fa4/ed0c0678517dc/firebird_base-2.0.3.tar.gz", hash = "sha256:fa4ed0c0678517dcf824c61cc323f8b802906c2b853ace5b235fbb418987fa84" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/91b/4f3c967d748b1/firebird_base-2.0.3-py3-none-any.whl", hash = "sha256:91b4f3c967d748b199b915bfd8cfa67818f6dff90ad636bd4ae84ff76ae89ab5" },
+]
+
+[[package]]
+name = "firebird-driver"
+version = "2.0.3"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+dependencies = [
+    { name = "firebird-base" },
+    { name = "python-dateutil" },
+]
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/3c7/8c63a1d692528/firebird_driver-2.0.3.tar.gz", hash = "sha256:3c78c63a1d69252880b02126c539d4a712d28563f45e896247c397cd2ada75ad" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/0c4/dbea53c8ff003/firebird_driver-2.0.3-py3-none-any.whl", hash = "sha256:0c4dbea53c8ff003cd1c6fd254524f72757fa921f13a6ae23d846c7071d4f337" },
+]
+
+[[package]]
+name = "firebird-dump-schema"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "firebird-driver" },
+    { name = "firebird-lib" },
+    { name = "python-dotenv" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pyright" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "firebird-driver", specifier = ">=1.10" },
+    { name = "firebird-lib", specifier = ">=1.5" },
+    { name = "python-dotenv", specifier = ">=1.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pyright", specifier = ">=1.1" }]
+
+[[package]]
+name = "firebird-lib"
+version = "2.0.1"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+dependencies = [
+    { name = "firebird-base" },
+    { name = "firebird-driver" },
+]
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/845/fc19a027f9b5c/firebird_lib-2.0.1.tar.gz", hash = "sha256:845fc19a027f9b5c66b4e8c6f5fd9a8887e5c29c9731f30dd2fb6536aed893d2" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/9c7/921df8d193ae2/firebird_lib-2.0.1-py3-none-any.whl", hash = "sha256:9c7921df8d193ae2498569c91742e37849fa2a1ad3bb9d5be0737925257cf0ab" },
+]
+
+[[package]]
+name = "nodeenv"
+version = "1.10.0"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/996/c191ad80897d0/nodeenv-1.10.0.tar.gz", hash = "sha256:996c191ad80897d076bdfba80a41994c2b47c68e224c542b48feba42ba00f8bb" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/5bb/13e3eed292361/nodeenv-1.10.0-py2.py3-none-any.whl", hash = "sha256:5bb13e3eed2923615535339b3c620e76779af4cb4c6a90deccc9e36b274d3827" },
+]
+
+[[package]]
+name = "protobuf"
+version = "5.29.6"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/da9/ee6a5424b6b30/protobuf-5.29.6.tar.gz", hash = "sha256:da9ee6a5424b6b30fd5e45c5ea663aef540ca95f9ad99d1e887e819cdf9b8723" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/62e/8a3114992c7c6/protobuf-5.29.6-cp310-abi3-win32.whl", hash = "sha256:62e8a3114992c7c647bce37dcc93647575fc52d50e48de30c6fcb28a6a291eb1" },
+    { url = "https://pypi.reid.local/root/pypi/+f/7e6/ad413275be172/protobuf-5.29.6-cp310-abi3-win_amd64.whl", hash = "sha256:7e6ad413275be172f67fdee0f43484b6de5a904cc1c3ea9804cb6fe2ff366eda" },
+    { url = "https://pypi.reid.local/root/pypi/+f/b5a/169e664b40571/protobuf-5.29.6-cp38-abi3-macosx_10_9_universal2.whl", hash = "sha256:b5a169e664b4057183a34bdc424540e86eea47560f3c123a0d64de4e137f9269" },
+    { url = "https://pypi.reid.local/root/pypi/+f/a88/66b2cff111f0f/protobuf-5.29.6-cp38-abi3-manylinux2014_aarch64.whl", hash = "sha256:a8866b2cff111f0f863c1b3b9e7572dc7eaea23a7fae27f6fc613304046483e6" },
+    { url = "https://pypi.reid.local/root/pypi/+f/e33/87f44798ac110/protobuf-5.29.6-cp38-abi3-manylinux2014_x86_64.whl", hash = "sha256:e3387f44798ac1106af0233c04fb8abf543772ff241169946f698b3a9a3d3ab9" },
+    { url = "https://pypi.reid.local/root/pypi/+f/6b9/edb641441b2da/protobuf-5.29.6-py3-none-any.whl", hash = "sha256:6b9edb641441b2da9fa8f428760fc136a49cf97a52076010cf22a2ff73438a86" },
+]
+
+[[package]]
+name = "pyright"
+version = "1.1.410"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+dependencies = [
+    { name = "nodeenv" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/07a/073b8ba674982/pyright-1.1.410.tar.gz", hash = "sha256:07a073b8ba6749826773c1269773efa11b93440d9a6aa60419d9a3172d6dc488" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/5e9/61bed37cacf96/pyright-1.1.410-py3-none-any.whl", hash = "sha256:5e961bed37cacf96b3f7cd7b1da39b350a9239aa2e69138d0e88f728cfaf296c" },
+]
+
+[[package]]
+name = "python-dateutil"
+version = "2.9.0.post0"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+dependencies = [
+    { name = "six" },
+]
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/37d/d54208da7e1cd/python-dateutil-2.9.0.post0.tar.gz", hash = "sha256:37dd54208da7e1cd875388217d5e00ebd4179249f90fb72437e91a35459a0ad3" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/a8b/2bc7bffae2822/python_dateutil-2.9.0.post0-py2.py3-none-any.whl", hash = "sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427" },
+]
+
+[[package]]
+name = "python-dotenv"
+version = "1.2.2"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/2c3/71a91fbd7ba08/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/1d8/214789a24de45/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a" },
+]
+
+[[package]]
+name = "six"
+version = "1.17.0"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/ff7/0335d468e7eb6/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/472/1f391ed90541f/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.15.0"
+source = { registry = "https://pypi.reid.local/reid21/dev/+simple/" }
+sdist = { url = "https://pypi.reid.local/root/pypi/+f/0ce/a48d173cc12fa/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466" }
+wheels = [
+    { url = "https://pypi.reid.local/root/pypi/+f/f0f/a19c6845758ab/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548" },
+]
