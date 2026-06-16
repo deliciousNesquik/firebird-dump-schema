@@ -13,6 +13,7 @@ audit_*.log
 __pycache__/
 *.pyc
 .venv/
+.pytest_cache/
 
 # Локальная конфигурация uv (внутренний индекс/CA — не для публичного репо)
 uv.toml

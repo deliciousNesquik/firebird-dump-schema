@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # firebird-driver грузит libfbclient лениво (на connect), но ставим заранее,
+      # чтобы импорт был гарантированно безопасен в любой среде.
+      - name: Install Firebird client library
+        run: sudo apt-get update && sudo apt-get install -y libfbclient2
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Sync dependencies (public PyPI)
+        run: uv sync --dev
+
+      - name: Type-check
+        run: uv run pyright fbschema
+
+      - name: Tests
+        run: uv run pytest -q
