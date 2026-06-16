@@ -121,18 +121,20 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--type имеет смысл только в точечном режиме или с --list")
 
     base_dir = Path.cwd()
-    # Аудит-лог пишем только когда реально пишем в дерево (полный или точечный
-    # без --stdout). Для --list и --stdout — только консоль.
-    writes_tree = not args.list_mode and not args.to_stdout
-    if writes_tree:
-        log.configure(base_dir)
-    log.info("Запуск процесса выгрузки схемы...")
 
     try:
         cfg = config.load(args.config, base_dir)
     except config.ConfigError as exc:
         log.error(str(exc))
         return 1
+
+    # Аудит-лог пишем только когда реально пишем в дерево (полный или точечный
+    # без --stdout) И он не отключён через AUDIT_LOG=false. Для --list/--stdout —
+    # только консоль.
+    writes_tree = not args.list_mode and not args.to_stdout
+    if writes_tree and cfg.audit_log:
+        log.configure(base_dir)
+    log.info("Запуск процесса выгрузки схемы...")
 
     log.debug(f"Файл окружения                  : [{cfg.source}]")
     log.debug(f"Пользователь БД                 : [{cfg.user}]")

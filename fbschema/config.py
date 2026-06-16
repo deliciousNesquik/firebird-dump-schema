@@ -9,9 +9,17 @@ from dotenv import dotenv_values
 
 REQUIRED_VARS = ("ISC_USER", "ISC_PASSWORD", "FB_DATABASE", "DUMP_DIR")
 
+_FALSEY = {"0", "false", "no", "off", "none", ""}
+
 
 class ConfigError(Exception):
     """Некорректная или неполная конфигурация."""
+
+
+def _as_bool(value: str | None, default: bool) -> bool:
+    if value is None:
+        return default
+    return value.strip().lower() not in _FALSEY
 
 
 @dataclass(frozen=True)
@@ -21,8 +29,9 @@ class Config:
     database: str
     dump_dir: Path
     timeout: int
-    charset: str  # кодировка соединения (DB_CHARSET; для legacy-баз, напр. WIN1251)
-    source: Path  # путь к использованному .env (для логов)
+    charset: str       # кодировка соединения (DB_CHARSET; для legacy-баз, напр. WIN1251)
+    audit_log: bool    # писать ли audit_YYYYMMDD.log (AUDIT_LOG; по умолчанию да)
+    source: Path       # путь к использованному .env (для логов)
 
 
 def load(path: str, base_dir: Path) -> Config:
@@ -58,5 +67,6 @@ def load(path: str, base_dir: Path) -> Config:
         dump_dir=dump_dir,
         timeout=timeout,
         charset=values.get("DB_CHARSET", "UTF8") or "UTF8",
+        audit_log=_as_bool(values.get("AUDIT_LOG"), default=True),
         source=cfg_path,
     )

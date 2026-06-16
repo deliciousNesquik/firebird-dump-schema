@@ -58,7 +58,7 @@ cli.main(argv)
 | --- | --- |
 | `cli.py` | argparse, выбор режима, `Run` (по-объектная устойчивость), exit-коды, оркестрация |
 | `config.py` | `Config` + `load()`/валидация; `ConfigError` |
-| `log.py` | `info`/`debug`/`warning`/`error`, аудит-лог `audit_YYYYMMDD.log` |
+| `log.py` | `info`/`debug`/`warning`/`error` → stderr; аудит-лог `audit_YYYYMMDD.log` (под `AUDIT_LOG`) |
 | `timeout.py` | `limit(seconds)` — сторож `ISQL_TIMEOUT` (SIGALRM; `<=0` отключает) |
 | `db.py` | `open_connection()`, `dialect()` и **политика NO-WAIT** (патч при импорте) |
 | `model.py` | `Artifact`, `Context`, `SUBDIRS` |
