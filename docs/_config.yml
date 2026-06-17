@@ -1,0 +1,4 @@
+title: Firebird Dump Schema
+description: Extract a Firebird schema into a one-object-per-file SQL tree — no isql
+theme: jekyll-theme-cayman
+show_downloads: false
