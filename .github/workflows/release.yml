@@ -1,0 +1,61 @@
+name: Release
+
+# Сборка самодостаточных бинарей под Windows/Linux/macOS и публикация в Releases.
+# Запускается на пуш тега вида v1.2.3.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.asset }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: fb-dump-schema-linux-x64
+          - os: windows-latest
+            asset: fb-dump-schema-windows-x64.exe
+          - os: macos-latest
+            asset: fb-dump-schema-macos-arm64
+    runs-on: ${{ matrix.os }}
+    env:
+      # PyInstaller стабильно поддерживает не самые свежие Python — пинним 3.12.
+      UV_PYTHON: "3.12"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install deps + build group (public PyPI)
+        run: uv sync --group build
+
+      - name: Build standalone binary
+        run: >
+          uv run pyinstaller --onefile --noconfirm --name fb-dump-schema
+          --collect-all firebird.driver --collect-all firebird.lib
+          --collect-all firebird.base --collect-all dotenv
+          pyinstaller_entry.py
+
+      - name: Stage artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            mv dist/fb-dump-schema.exe "out/${{ matrix.asset }}"
+          else
+            mv dist/fb-dump-schema "out/${{ matrix.asset }}"
+            chmod +x "out/${{ matrix.asset }}"
+          fi
+
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/${{ matrix.asset }}
+          fail_on_unmatched_files: true

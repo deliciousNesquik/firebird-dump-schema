@@ -20,5 +20,13 @@ uv.toml
 # uv.lock фиксировал внутренние URL индекса; не коммитим до перехода на публичный PyPI
 uv.lock
 
+# PyInstaller (сборка бинарей)
+/build/
+/dist/
+*.spec
+
+# GitHub Pages (локальная сборка Jekyll)
+/docs/_site/
+
 # macOS
 .DS_Store

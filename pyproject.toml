@@ -40,6 +40,11 @@ dev = [
     "pyright>=1.1",
     "pytest>=8",
 ]
+# Только для сборки бинарей в CI релиза (ставится с публичного PyPI: uv sync --group build).
+# Не в dev, чтобы не ломать локальный sync на внутреннем индексе, где pyinstaller может отсутствовать.
+build = [
+    "pyinstaller>=6",
+]
 
 [build-system]
 requires = ["hatchling"]

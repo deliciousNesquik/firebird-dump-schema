@@ -12,7 +12,26 @@
 * **Безопасность** — учётные данные читаются из окружения, не передаются в аргументах команды и маскируются в логах.
 * **Персистентный аудит** — весь вывод дублируется в `audit_YYYYMMDD.log`.
 
-## Требования
+## Готовые бинарники (без Python и uv)
+
+Проще всего — скачать самодостаточный исполняемый файл со страницы
+[**Releases**](https://github.com/deliciousNesquik/firebird-dump-schema/releases)
+(собираются CI под Windows/Linux/macOS):
+
+```bash
+# Linux / macOS
+chmod +x fb-dump-schema-linux-x64
+./fb-dump-schema-linux-x64 --help
+```
+
+- **macOS:** бинарь не подписан — разрешите его в «Конфиденциальность и безопасность» при первом запуске.
+- **Нужна клиентская библиотека Firebird** (`fbclient.dll` / `libfbclient.so` / `libfbclient.dylib`):
+  её грузит драйвер в рантайме. Обычно есть там, где работают с Firebird; иначе поставьте Firebird client/сервер.
+
+Документация также опубликована на [GitHub Pages](https://deliciousNesquik.github.io/firebird-dump-schema/).
+Ниже — запуск из исходников (для разработки).
+
+## Требования (из исходников)
 
 * Python 3.11+.
 * [`uv`](https://docs.astral.sh/uv/) (рекомендуется — собирает окружение из `pyproject.toml` автоматически).
