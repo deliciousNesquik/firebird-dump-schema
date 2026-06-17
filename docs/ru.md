@@ -3,7 +3,7 @@ title: Firebird Dump Schema
 description: Выгрузка схемы Firebird в дерево «один объект — один файл» — без isql
 ---
 
-[English]({{ '/' | relative_url }}) · **Русский**  ·  [GitHub](https://github.com/deliciousNesquik/firebird-dump-schema) · [Releases](https://github.com/deliciousNesquik/firebird-dump-schema/releases)
+[English](index.html) · **Русский**  ·  [GitHub](https://github.com/deliciousNesquik/firebird-dump-schema) · [Releases](https://github.com/deliciousNesquik/firebird-dump-schema/releases)
 
 Превращает схему живой базы **Firebird** в чистое, дружелюбное к diff'ам дерево
 `.sql`-файлов — **один объект на файл**. Для контроля версий, бэкапов и CI/CD.
