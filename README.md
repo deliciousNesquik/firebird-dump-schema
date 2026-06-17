@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/banner-640x320.png" alt="Firebird Dump Schema" width="640"></p>
+
 # Firebird Dump Schema
 
 **English** · [Русский](README.ru.md)
