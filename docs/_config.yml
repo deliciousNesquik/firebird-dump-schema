@@ -2,3 +2,8 @@ title: Firebird Dump Schema
 description: Extract a Firebird schema into a one-object-per-file SQL tree — no isql
 theme: jekyll-theme-cayman
 show_downloads: false
+
+# Project page: сайт обслуживается под /firebird-dump-schema/.
+# Без этого CSS темы и внутренние ссылки (relative_url) указывают на корень домена → 404.
+url: "https://deliciousnesquik.github.io"
+baseurl: "/firebird-dump-schema"

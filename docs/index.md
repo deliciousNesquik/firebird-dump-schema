@@ -3,7 +3,7 @@ title: Firebird Dump Schema
 description: Extract a Firebird schema into a one-object-per-file SQL tree — no isql
 ---
 
-**English** · [Русский]({% link ru.md %})  ·  [GitHub](https://github.com/deliciousNesquik/firebird-dump-schema) · [Releases](https://github.com/deliciousNesquik/firebird-dump-schema/releases)
+**English** · [Русский]({{ '/ru.html' | relative_url }})  ·  [GitHub](https://github.com/deliciousNesquik/firebird-dump-schema) · [Releases](https://github.com/deliciousNesquik/firebird-dump-schema/releases)
 
 Turn a live **Firebird** database schema into a clean, diff-friendly tree of
 `.sql` files — **one object per file**. Built for version control, backups and
