@@ -28,8 +28,18 @@ class WriteMode(enum.Enum):
 
 def prepare_tree(dump_dir: Path) -> None:
     if dump_dir.exists():
-        log.info(f"Удаление прежней выходной директории: {dump_dir}")
-        shutil.rmtree(dump_dir)
+        # Чистим СОДЕРЖИМОЕ, но сохраняем VCS-метаданные (.git, .gitignore, ...):
+        # дерево обычно лежит в git-рабочей копии (baseline/refresh коммитера), и
+        # rmtree всего каталога снёс бы .git, сломав коммит. Удалённые с прошлого
+        # дампа объекты корректно проявятся как удаления файлов при `git add -A`.
+        log.info(f"Очистка выходной директории (с сохранением .git*): {dump_dir}")
+        for child in dump_dir.iterdir():
+            if child.name.startswith(".git"):
+                continue
+            if child.is_dir():
+                shutil.rmtree(child)
+            else:
+                child.unlink()
     log.info("Создание структуры директорий...")
     for sub in SUBDIRS:
         (dump_dir / sub).mkdir(parents=True, exist_ok=True)
