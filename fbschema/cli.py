@@ -159,11 +159,16 @@ def main(argv: list[str] | None = None) -> int:
 
     started = datetime.now()
     con = None
+    schema: Any = None
     try:
         with timeout.limit(cfg.timeout):
             log.info("Подключение и чтение метаданных (read-committed, rec-version, NO WAIT)...")
             con = db.open_connection(cfg)
-            ctx = Context(schema=con.schema, dialect=db.dialect(con),
+            # Устойчивое чтение: коллекции, не читаемые основной кодировкой
+            # (смешанные кодировки метаданных legacy-БД), дочитываются через
+            # запасное соединение с противоположной кодировкой.
+            schema = db.resilient_schema(cfg, con)
+            ctx = Context(schema=schema, dialect=db.dialect(con),
                           with_generator_values=args.with_generator_values)
 
             if args.list_mode:
@@ -184,6 +189,8 @@ def main(argv: list[str] | None = None) -> int:
         log.error(f"Ошибка при извлечении схемы: {exc}")
         return 1
     finally:
+        if schema is not None:
+            schema.close_fallback()
         if con is not None:
             try:
                 con.close()

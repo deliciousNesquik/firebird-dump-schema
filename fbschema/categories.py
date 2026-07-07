@@ -185,6 +185,9 @@ def full_grants(ctx: Context) -> Iterator[Artifact]:
         if p.user_name != "SYSDBA" and not _is_sys(p.subject)
     ]
     # sorted — детерминированный порядок строк в GRANTS.sql.
+    # Если объект-субъект содержит символ вне кодировки соединения, резолв упадёт
+    # на транслитерации — тогда вся секция 12_GRANTS будет штатно пропущена
+    # обёрткой Run.emit_section (быстрый fail, не построчный перебор 40k+ привилегий).
     for stmt in sorted(get_grants(privs)):
         yield Artifact("12_GRANTS/GRANTS.sql", stmt)
 
